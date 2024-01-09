@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "463804723388",
+    "project_id": "hidjama-3326f",
+    "storage_bucket": "hidjama-3326f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463804723388:android:69f966aa7e91f9e8f7e0b9",
+        "android_client_info": {
+          "package_name": "com.hidjama"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8EAgbT2x4BBzzeptyPAlsmcMK1zTt16U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
