@@ -3,7 +3,7 @@ import { ScreenProps } from '@/navigators/types';
 import { AppointmentContainerAllProps } from '@/presentation/container/AppointmentContainer';
 import { groupBy, timeDateToDate } from '@/utils';
 import React, {useEffect, useState} from 'react';
-import {Alert, Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Alert, Modal, PermissionsAndroid, Pressable, StyleSheet, Text,  TouchableOpacity, View} from 'react-native';
 import {
   ExpandableCalendar,
   TimelineEventProps,
@@ -18,6 +18,8 @@ import { opacity } from 'react-native-reanimated/lib/typescript/reanimated2/Colo
 import { Event } from 'react-native-calendars/src/timeline/EventBlock';
 
 import Toast from 'react-native-toast-message';
+
+import { TextInput } from 'react-native-paper';
 
 /**
  * TITLE, DETAILS => Django Model
@@ -174,9 +176,10 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
   const [timeObject, setTimeObject] = useState<EventTimeObject>();
   const [title, setTitle] = useState<Nullable<string>>()
   const [summary, setSummary] = useState<Nullable<string>>()
-  const [selectedColor, setSelectedColor] = useState('#e6add8'); 
+  const [selectedColor, setSelectedColor] = useState('antiquewhite'); 
   const [currentEvent, setCurrentEvent] = useState<Event>()
 
+  const [sendRequestTemp,setSendRequestTemp] = useState(true)
 
   useEffect(() => {
     console.log('DATE',state.eventsByDate)
@@ -255,6 +258,8 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
 
   function onPressApprove() {
       console.log('timeObject?.date',timeObject?.date)
+      if(sendRequestTemp) {
+        setSendRequestTemp(false)
       
         const draftEvent = {
           ...state.eventsByDate[ currentEvent? timeDateToDate(currentEvent.start): timeObject?.date].find((ev) => ev.id === (currentEvent?.id ?? 'draft'))
@@ -275,22 +280,21 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
           }).
             unwrap().
             then(({response, type}) => {
-              
-              setState((s) => ({...s, eventsByDate: { ...s.eventsByDate,[timeObject?.date]: [...s.eventsByDate[timeObject?.date] ,response]}}));
+              console.log('timeObject', timeObject)
+              setState((s) => ({...s, eventsByDate: { 
+                  ...s.eventsByDate,
+                  [timeObject?.date]: [...s.eventsByDate[timeObject?.date] , {...response}]
+                }
+              }));
 
-              setModalVisible(!modalVisible);
               console.log("UI RES",response)
-              console.log(state)
-
             }).catch((err) => {
 
               Toast.show({type: 'error', text1: "Try again later"})
               console.log('UI APPOINTMENT ERROR', err)
               
             }).finally(() => {
-
               canceledNewEvent( true )
-
             })
         } else {
           // UPDATE
@@ -300,7 +304,6 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
           }).unwrap()
             .then(({response}) => {
               const updateDate = timeDateToDate(currentEvent.start)
-            Toast.show({type: 'success', text1: "Successfully updated"})
             console.log('updatedEvent', response)
             setState((s) => ({...s, eventsByDate: { ...s.eventsByDate,[updateDate]: s.eventsByDate[updateDate].map((existingEvent) => {
               if( existingEvent.id === response.id ) {
@@ -318,7 +321,7 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
           })
 
         }
-     
+      }
   }
   function onEventPress(event: Event & {status: string}) {
     console.log('EE',event)
@@ -329,7 +332,7 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
       setSelectedColor(event.color ?? '#e6add8')
      setCurrentEvent(event)
      
-     setModalVisible(!modalVisible);
+     setModalVisible(true);
 
      setTimeout(() => {
       setEditMode(true)
@@ -363,16 +366,22 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
   }
 
   function canceledNewEvent(rollBack?) {
+    setSendRequestTemp(true)
+
     setCurrentEvent(null)
 
     setTitle(null);
     setSummary(null);
     setModalVisible(!modalVisible);
     if (timeObject?.date && rollBack) {
-      state.eventsByDate[timeObject.date] = state.eventsByDate[timeObject.date].filter(e => e.id !== 'draft')
-      setState((s) => ({...s, eventsByDate: state.eventsByDate}));
+      setState((s) => ({...s, eventsByDate: {...s.eventsByDate, [timeObject.date]: s.eventsByDate[timeObject.date].filter(e => e.id !== 'draft') }}));
     }
 
+  }
+
+  function onModalCloseHandler() {
+
+    canceledNewEvent( true )
   }
 
   // const approveNewEvent: TimelineProps['onBackgroundLongPressOut'] = (_timeString, timeObject) => {
@@ -413,6 +422,8 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
     setSummary(text)
   }
 
+  
+
   useEffect(() => {
 
     setEditMode(false)
@@ -425,10 +436,7 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
         animationType="fade"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-          setModalVisible(!modalVisible);
-        }}>
+        onRequestClose={onModalCloseHandler}>
         <View style={styles.centeredView}>
           {editMode ? (
             <View style={styles.top}>
@@ -440,7 +448,7 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
               <TouchableOpacity style={styles.button} onPress={onPressCancel}>
                 <Text style={styles.textStyle}>CANCEL</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.button} onPress={onPressApprove}>
+              <TouchableOpacity style={[styles.button, {opacity: !(!!title) ? 0.5 : 1}]} onPress={onPressApprove} disabled={!(!!title)}>
                 <Text style={styles.textStyle}>SAVE</Text>
               </TouchableOpacity>
             </View>)
@@ -451,35 +459,36 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
               <Ionicons name="code" size={20} />
               <TextInput 
                   style={styles.input}
-                  placeholder="Title"
+                  label="Title"
                   onChangeText={onTitleChange}
                   value={title}
               />
+              
             </View>
             <View style={styles.rowContainer}>
-              <Ionicons name="code-working-sharp" size={20}/>
+              <Ionicons name="code" size={20}/>
               <TextInput 
                   style={styles.input}
-                  placeholder="Summary"
+                  label="Summary"
                   onChangeText={onSummaryChange}
                   value={summary}
               />
             </View>
             <View style={styles.radioGroup}>
               <CustomRadioButton 
-                  color={'#e6add8'}
-                  selected={selectedColor === '#e6add8'} 
-                  onSelect={() => setSelectedColor('#e6add8')} 
+                  color={'antiquewhite'}
+                  selected={selectedColor === 'antiquewhite'} 
+                  onSelect={() => setSelectedColor('antiquewhite')} 
               /> 
               <CustomRadioButton 
-                  color={'lightgreen'}
-                  selected={selectedColor === 'lightgreen'} 
-                  onSelect={() => setSelectedColor('lightgreen')} 
+                  color={'pink'}
+                  selected={selectedColor === 'pink'} 
+                  onSelect={() => setSelectedColor('pink')} 
               /> 
               <CustomRadioButton 
-                  color={'powderblue'}
-                  selected={selectedColor === 'powderblue'} 
-                  onSelect={() => setSelectedColor('powderblue')} 
+                  color={'salmon'}
+                  selected={selectedColor === 'salmon'} 
+                  onSelect={() => setSelectedColor('salmon')} 
               /> 
             </View>
            
@@ -550,7 +559,7 @@ const styles = StyleSheet.create({
 
   input: { 
     
-
+    backgroundColor: 'white',
     borderTopColor: 'transparent',
     borderBottomColor: 'rgba(0,0,0,0.1)',
     borderTopWidth: 0,

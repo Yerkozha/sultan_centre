@@ -1,33 +1,69 @@
 import 'react-native-gesture-handler';
 import React, { useEffect } from "react";
-import notifee from '@notifee/react-native';
 
-import {AppNavigators} from '@/navigators/Application.tsx';
-import { NotificationListener, requestUserPermission } from "./src/services/PushNotificationController.ts";
+import AppNavigators from '@/navigators/Application.tsx';
+import { FirebaseMessageHandlers } from "./src/services/PushNotificationController.ts";
 import { Provider } from 'react-redux';
 import { persistor, store } from '@/store';
 import { PersistGate } from 'redux-persist/integration/react';
 import Toast from 'react-native-toast-message';
-import { ErrorBoundary } from '@/services/ErrorBoundary.tsx';
+import ErrorBoundary from '@/services/ErrorBoundary.tsx';
+
+import { MD3LightTheme as DefaultTheme, PaperProvider } from 'react-native-paper';
+
+const theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: 'royalblue',
+    
+    background: 'white',
+  },
+};
+/**
+ * NOTIFICATION SYSTEM
+ * HOME PAGE PHOTO
+ * LOGO
+ * UX/UI LOGIN && PROFILE
+ * RELEASE
+ */
+
+/**
+ * 
+ * TASKS SMS login, email
+ * fix calendar crud, use materials design theme and other components, 
+ * react native firebase token model save
+ * chat 
+ * photo
+ * PRACTICE HARD
+ */
 
 function App(): React.JSX.Element {
   
   
   useEffect(() => {
-    requestUserPermission()
-    NotificationListener()
-  }, [])
+
+    FirebaseMessageHandlers.requestUserPermission();
+    const unsubscribers = FirebaseMessageHandlers.initializeRemoteMessageHandlers();
+    return () => {
+      if(unsubscribers.length) {
+        unsubscribers.forEach((unsubscriber) => unsubscriber())
+      }
+    }
+  }, []);
 
   return (
       <>
         <Provider store={store}>
           <PersistGate persistor={persistor} loading={null}>
-            <ErrorBoundary>
-              <AppNavigators />
-              <Toast 
-                visibilityTime={4000}
-              />
-            </ErrorBoundary>
+            <PaperProvider theme={theme}>
+              <ErrorBoundary>
+                <AppNavigators />
+                <Toast 
+                  visibilityTime={4000}
+                />
+              </ErrorBoundary>
+            </PaperProvider>
           </PersistGate>
         </Provider>
       </>
@@ -36,41 +72,13 @@ function App(): React.JSX.Element {
 
 export default App;
 
-//   // return (
-//   //   <SafeAreaView style={backgroundStyle}>
-//   //     <StatusBar
-//   //       barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-//   //       backgroundColor={backgroundStyle.backgroundColor}
-//   //     />
-//   //     <ScrollView
-//   //       contentInsetAdjustmentBehavior="automatic"
-//   //       style={backgroundStyle}>
-//   //       <Header />
-//   //       <View
-//   //         style={{
-//   //           backgroundColor: isDarkMode ? Colors.black : Colors.white,
-//   //         }}>
-//   //         <Button title={"Pusher"} onPress={pressHandler} />
 
-//   //         <Section title="Step One">
-//   //           <Text style={styles.highlight}> HELLO WORLD! </Text>
-
-//   //         </Section>
-//   //         <Section title="See Your Changes">
-//   //           <ReloadInstructions />
-//   //         </Section>
-//   //         <Section title="Debug">
-//   //           <DebugInstructions />
-//   //         </Section>
-//   //         <Section title="Learn More">
-//   //           Read the docs to discover what to do next:
-//   //         </Section>
-//   //         <LearnMoreLinks />
-//   //       </View>
-//   //     </ScrollView>
-//   //   </SafeAreaView>
-//   // );
-// }
-
-
-
+/**
+ * Backend practice async, eventEmitter
+ * 
+ * fetch parseError, icon push notification, foreground notification, login error
+ * 
+ * Video, Image work => stream optimize
+ * 
+ * AbortControler to abort request actions when fast jumping pages !!!
+ */

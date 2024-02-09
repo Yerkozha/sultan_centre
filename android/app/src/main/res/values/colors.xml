@@ -1,3 +1,5 @@
 <resources>
     <color name="white">#FFF</color>
+    <color name="my_custom_color">#123456</color>
 </resources>
+

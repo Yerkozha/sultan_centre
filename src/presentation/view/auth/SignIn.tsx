@@ -33,12 +33,14 @@ function SignIn({vm, auth, resetError}: AuthContainerAllProps & AuthProps & Scre
                 type: 'login',
                 email,
                 password
-            }).unwrap().then(async(data) => {
+            }).unwrap().then((data) => {
                 console.log('LOGIN',data)
                 console.log('RR',data['refresh'])
-                await AsyncStorage.setItem('access', data['access'])
-                await AsyncStorage.setItem('refresh', data['refresh'])
+                AsyncStorage.setItem('access', data['access'])
+                AsyncStorage.setItem('refresh', data['refresh'])
             })
+
+           
         }   
     }
 

@@ -1,7 +1,7 @@
 import { store } from "@/store";
-import { UserCredentials } from "./types";
+import { FCMCredentials, UserCredentials } from "./types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { userResetStore } from "@/store/user/user";
+import { raiseRootError, userResetStore } from "@/store/user/user";
 import { appointmentResetStore } from "@/store/appointment/appointment";
 
 
@@ -119,7 +119,7 @@ export class Base extends FetchBase {
          */
         const access = await AsyncStorage.getItem('access')
 
-        const request = this.makeRequestBasedOnOptions( this.originURL + restEndpoint, super.fetchOptions, fetchOptions )
+        const request = this.makeRequestBasedOnOptions( this.originURL + restEndpoint,  super.fetchOptions, fetchOptions )
         
         console.log("MERGED REQUEST OPTIONS", request)
 
@@ -160,15 +160,26 @@ export class Base extends FetchBase {
          */
         console.log('retryOption', retryOption)
         console.log('makeRequest REQUEST', request)
+        let
+            response: Awaited<ReturnType<typeof fetch>>;
+        try{
 
-        
-        let response: Awaited<ReturnType<typeof fetch>> = await new Promise((resolve, reject) => {
-            setTimeout( () => {
+            response = await new Promise((resolve, reject) => {
+                setTimeout( () => {
+                    
+                    resolve( fetch( request.clone()) )
+                    
+                }, retryOption.delay(retryOption.delayCount++) ) ;
+            });
 
-                resolve(fetch( request.clone()))
 
-            }, retryOption.delay(retryOption.delayCount++) ) ;
-        }) 
+        } catch(error) {
+
+            this.networkError(error)
+
+            throw error
+        }
+         
         
         console.log('makeRequest RESPONSE', response)
 
@@ -185,12 +196,28 @@ export class Base extends FetchBase {
 
         } else if ( /refresh/.test(response.url) ) {
 
-            this.clearStorage();
+            this.clearStorage(true);    // true with redux store
 
         }
 
+        const serializedResponse = await this.serializerResponse(response);
         
-        throw await this.serializerResponse(response)
+        throw serializedResponse
+    }
+
+    static networkError(error) {
+
+        if( error instanceof TypeError && /network/i.test(error.message) ) {
+
+            console.log('NETWORK MESSAGE ', error.message)
+            console.log('NETWORK NAME!!!! ', error.name)
+            /**
+             * perform try again UI
+             */
+            store.dispatch(raiseRootError())
+            // this.clearStorage()
+          }
+
     }
 
     // static async COPY(prevRequest: InstanceType<typeof Request>, {retry, delay}) {
@@ -239,7 +266,7 @@ export class Base extends FetchBase {
 
     static async serializerResponse(response) {
 
-        if( response instanceof Response  ) {
+        if( response instanceof Response && !response.bodyUsed ) {
             return await response.json()
 
         }
@@ -251,14 +278,29 @@ export class Base extends FetchBase {
     static async retryRequest(prevRequest: InstanceType<typeof Request>, retryOption) {
 
         let response = await this.refreshToken(retryOption);
+        prevRequest.headers.set('Authorization',`Bearer ${response.access}`);
 
-        prevRequest = this.makeRequestBasedOnOptions(prevRequest.url, super.fetchOptions, { headers: {
-                Authorization: `Bearer ${response.access}`,
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({refresh: response.refresh}) 
-        });
+        console.log('prevRequest',prevRequest)
+
+        if( /logout/.test(prevRequest.url) ) {
+            const option = { 
+                headers: {
+                    Authorization: `Bearer ${response.access}`,
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                method: prevRequest.method
+            }
+            Object.defineProperty(option, 'body', {
+                value: JSON.stringify( {refresh:response.refresh} ),
+                configurable: true,
+                writable: true,
+                enumerable: true
+            })
+    
+            prevRequest = this.makeRequestBasedOnOptions(prevRequest.url, super.fetchOptions, option);
+        }
+        
         console.log('before REFRESH', retryOption)
         return await this.makeRequest(prevRequest, retryOption)
 
@@ -293,11 +335,13 @@ export class Base extends FetchBase {
         throw response
     }
 
-    static async clearStorage() {
+    static async clearStorage(clearStore?) {
         await AsyncStorage.removeItem('refresh');
         await AsyncStorage.removeItem('access');
-        await store.dispatch(userResetStore())
-        await store.dispatch(appointmentResetStore())
+        if(clearStore) {
+            await store.dispatch(userResetStore())
+            await store.dispatch(appointmentResetStore())
+        }
     }
 
 }
@@ -341,6 +385,13 @@ export class AuthController extends Base {
         return data
     }
 
+    static async attachFCMToken<T>( fcmCredentials: FCMCredentials ): Promise<T> {
+        const data = await this.fetch<T>( 'users/devices/', {
+            body: JSON.stringify(fcmCredentials)
+        })
+        return data
+    }
+
 }
 
 export class AppointmentController extends Base {
@@ -376,6 +427,9 @@ export class AppointmentController extends Base {
 
 }
 
+
+
+
 function attachToken(target:any, ctx) {
 
 
@@ -385,3 +439,10 @@ function attachToken(target:any, ctx) {
         return Promise.resolve(1)
     }
 }
+
+
+/**
+ * 
+ * handle network error
+ * 
+ */

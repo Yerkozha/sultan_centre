@@ -8,7 +8,7 @@ import { isObject } from '@/utils';
 
 
 interface AppointmentState {
-    appointments: Nullable<Array<Appointment>>,
+    appointments: Array<Appointment>,
     error: Array<unknown>
 }
 
@@ -54,7 +54,7 @@ export const appointment = createAsyncThunk( 'appointment/process' , async ( app
 })
 
 const initialState: AppointmentState = {
-    appointments: null,
+    appointments: [],
     error: []
 } 
 

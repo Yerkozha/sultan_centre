@@ -18,7 +18,7 @@ export class RequestEngine {
 
         console.log('INSIDE ATTACH TOKEN INTERCEPTOR' , request )
 
-        if( !/(login|registration|refresh)/g.test(request.url) && !request.headers.has('Authorization') ) {
+        if( !/(login|registration|refresh|devices)/g.test(request.url) && !request.headers.has('Authorization') ) {
             console.log("REGS")
             request.headers.set('Authorization', `Bearer ${access}`)
         }

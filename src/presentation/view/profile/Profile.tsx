@@ -21,7 +21,11 @@ function Profile({vm, auth}: ProfileProps & ProfileContainerAllProps & ProfileRo
             type: 'logout'
         }).unwrap().then(async() => {
             await AsyncStorage.clear()
-        }).catch(console.log)
+        }).catch((error) => {
+
+            console.log('LAST UI POINT', error)
+            
+        })
     }
     
     return <View>

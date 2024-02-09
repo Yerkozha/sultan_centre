@@ -23,6 +23,11 @@ export type UserCredentials = {
     password: string
 }
 
+export interface  FCMCredentials  {
+    type: "ios" | "android" | "web"
+    registration_id: string
+}
+
 interface User {
   id: number;
   appointments: Appointment[]; // Assuming you have an Appointment type/interface

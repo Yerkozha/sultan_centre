@@ -17,7 +17,8 @@ import { StackNavigators } from './StackNavigators';
 import { useAppSelector } from '@/hooks/useStore';
 import { Base } from '@/api';
 import { RequestEngine, ResponseEngine } from '@/api/interceptors';
-
+import { ConnectedProps, connect, shallowEqual, useStore } from 'react-redux';
+import { RootState } from '@/store';
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 
@@ -47,10 +48,13 @@ const tabScreenOption = ({ route }: TapOptionRoute) => ({
     headerShown: false
 })
 
-export function AppNavigators () {
-   
-    const accessToken = useAppSelector(state => state.user.access)
 
+
+function AppNavigators ({access}) {
+   console.log('access', access)
+
+   const accessToken = (useStore().getState() as RootState).user.access
+    console.log('accessToken', accessToken)
     useEffect(() => {
         Base.getInstance().attachInterceptorEngine(new RequestEngine()).attachInterceptorEngine(new ResponseEngine())
     }, [])
@@ -80,6 +84,13 @@ export function AppNavigators () {
     )
 }
 
+const connector = connect((state: RootState) => ({access: state.user.access}))
+
+export type AuthContainerAllProps = ConnectedProps<typeof connector> & {
+    
+}
+
+export default connector(AppNavigators)
 
 const styles = StyleSheet.create({
     container: {

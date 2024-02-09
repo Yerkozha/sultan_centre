@@ -14,7 +14,7 @@ interface UserInitialState {
   password: Nullable<string>
   language: string
   error: Nullable<Array<unknown>>
-  
+  rootError: boolean
 }
 
 const initialState: UserInitialState = {
@@ -23,7 +23,9 @@ const initialState: UserInitialState = {
   authenticatedUser: null,
   language: 'en',
   error: [],
-  password: null
+  password: null,
+
+  rootError: false
 }
 
 export const auth = createAsyncThunk('user/auth', async (auth: UserCredentials & {type: string}, {rejectWithValue, getState}) => {
@@ -74,7 +76,7 @@ export const auth = createAsyncThunk('user/auth', async (auth: UserCredentials &
         data.password = password
         
         if( auth.type === 'logout' ) {
-          return initialState
+          return {...initialState}
         }
         return data
       }
@@ -82,16 +84,9 @@ export const auth = createAsyncThunk('user/auth', async (auth: UserCredentials &
       throw rejectWithValue(data)
 
     } catch(error) {
-
       console.log('THROWN ERROR ', error)
 
-      if( error instanceof TypeError ) {
-        console.log('NETWORK MESSAGE ', error.message)
-        console.log('NETWORK NAME ', error.name)
-        /**
-         * perform try again UI
-         */
-      }
+      
 
       throw rejectWithValue(error)
 
@@ -100,14 +95,18 @@ export const auth = createAsyncThunk('user/auth', async (auth: UserCredentials &
 })
 
 
-
+/**
+ * AbortControler to abort request actions when fast jumping pages !!!
+ */
 
 export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
     userResetStore: (state) => initialState,
-    resetError: (state) => { state.error = [] }
+    resetError: (state) => { state.error = [] },
+    raiseRootError: (state) => { state.rootError = true },
+    hideRootError: (state) => { state.rootError = false }
   },
 
   extraReducers: (builder) => {
@@ -115,11 +114,13 @@ export const userSlice = createSlice({
     builder.addCase(auth.fulfilled, (state, { payload }) => {
 
       console.log( 'UPDATE STATE with FOLLOWING PAYLOAD', payload )
-
+      Object.assign(payload, {
+        language: 'en',
+        error: [],
+        rootError: undefined
+      })
       return {
         ...payload,
-        language: 'en',
-        error: []
       }
 
     })
@@ -134,6 +135,6 @@ export const userSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { resetError, userResetStore } = userSlice.actions
+export const { resetError, userResetStore, raiseRootError, hideRootError } = userSlice.actions
 
 
