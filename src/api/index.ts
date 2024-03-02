@@ -424,6 +424,31 @@ export class AppointmentController extends Base {
         return data
         
     }
+    
+    
+
+}
+
+export class ArticlesController extends Base {
+
+    static async getListArticles() {
+
+        const data = await this.fetch( `articles/list_articles`, {
+            method: "GET"
+        })
+        
+        return data
+        
+    }
+
+    static async createArticle<T>( articleDetails ): Promise<T> {
+
+        const data = await this.fetch<T>( 'articles/create_article/', {
+            body: JSON.stringify(articleDetails)
+        } )
+        
+        return data
+    }
 
 }
 

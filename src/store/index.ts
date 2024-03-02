@@ -4,6 +4,7 @@ import { persistStore, persistReducer } from 'redux-persist'
  
 import { userSlice } from './user/user'
 import { appointmentSlice } from './appointment/appointment'
+import { articleSlice } from './articles/articles'
 
 
 const persistConfig = {
@@ -14,7 +15,8 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   user: userSlice.reducer,
-  appointment: appointmentSlice.reducer
+  appointment: appointmentSlice.reducer,
+  articles: articleSlice.reducer
 });
 
 const appReducer = (state, action) => {

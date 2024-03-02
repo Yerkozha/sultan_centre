@@ -1,8 +1,13 @@
+import { Article } from '@/store/articles/articles';
 import type { RouteProp } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
-  Home: undefined;
+  Articles: undefined;
+  ArticlePage: {
+    article: Article
+  };
+  HomeContainer: undefined;
   Appointment: undefined;
   Auth: undefined;
   Profile: undefined;
@@ -10,7 +15,7 @@ export type RootStackParamList = {
   SignIn: undefined;
   
   BottomTabNavigators: undefined;
-  StackNavigators: undefined;
+  AppointmentStackNavigator: undefined;
   
 };
 

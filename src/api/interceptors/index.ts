@@ -18,7 +18,7 @@ export class RequestEngine {
 
         console.log('INSIDE ATTACH TOKEN INTERCEPTOR' , request )
 
-        if( !/(login|registration|refresh|devices)/g.test(request.url) && !request.headers.has('Authorization') ) {
+        if( !/(login|registration|refresh|devices|list_articles)/g.test(request.url) && !request.headers.has('Authorization') ) {
             console.log("REGS")
             request.headers.set('Authorization', `Bearer ${access}`)
         }
@@ -54,7 +54,18 @@ export class ResponseEngine {
              */
 
             console.log('inside',response)
-            return await response.json()
+            const data = await response.json()
+            
+            /**
+             * DELETE DEBUG IN PROD
+             */
+            // if(Object.hasOwn(data, 'articles')) {
+            //     Object.defineProperty(data, 'articles', {
+            //         enumerable: false,
+            //     })
+            // }
+            //
+            return data
 
         } else if ( response.status == 401 ) {
             

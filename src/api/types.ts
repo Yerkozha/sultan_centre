@@ -1,3 +1,4 @@
+
 enum ROLES {
     ADMIN = 1,
     MANAGER = 2,
@@ -22,6 +23,14 @@ export type UserCredentials = {
     email: string
     password: string
 }
+
+
+export type ArticleCredentials = {
+    title: string
+    content: string
+    image: unknown
+}
+
 
 export interface  FCMCredentials  {
     type: "ios" | "android" | "web"

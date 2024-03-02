@@ -8,12 +8,11 @@ import { navigationRef } from './utils';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import { HomeContainer } from '@/presentation/container/HomeContainer';
+import {HomeContainer} from '@/presentation/container/HomeContainer';
 import ProfileContainer from '@/presentation/container/ProfileContainer';
-import AppointmentContainer from '@/presentation/container/AppointmentContainer';
 import AuthContainer from '@/presentation/container/AuthContainer';
 
-import { StackNavigators } from './StackNavigators';
+import { AppointmentStackNavigator } from './StackNavigators';
 import { useAppSelector } from '@/hooks/useStore';
 import { Base } from '@/api';
 import { RequestEngine, ResponseEngine } from '@/api/interceptors';
@@ -30,7 +29,7 @@ const tabScreenOption = ({ route }: TapOptionRoute) => ({
         iconName = focused
         ? 'information-circle'
         : 'information-circle-outline';
-    } else if (route.name === 'StackNavigators') {
+    } else if (route.name === 'AppointmentStackNavigator') {
         iconName = focused ? 'list' : 'list-outline';
     } else if (route.name === 'Profile') {
         iconName = focused ? 'accessibility' : 'accessibility-outline';
@@ -66,10 +65,11 @@ function AppNavigators ({access}) {
                 <Tab.Navigator
                     screenOptions={tabScreenOption}
                 >
-                    <Tab.Screen name="Home"  component={HomeContainer} options={{title: 'Bla', headerShown: true}} />
+                    <Tab.Screen name="HomeContainer"  component={HomeContainer} />
+                    {/*  options={{title: 'Bla', headerShown: true}} */}
                     { accessToken ? (
                     <>
-                        <Tab.Screen name="StackNavigators"  component={StackNavigators} />
+                        <Tab.Screen name="AppointmentStackNavigator"  component={AppointmentStackNavigator} />
                         <Tab.Screen name="Profile"          component={ProfileContainer} />
                     </>
                 ) : (

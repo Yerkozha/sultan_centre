@@ -8,7 +8,7 @@ import AppointmentContainer from "@/presentation/container/AppointmentContainer"
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 
-export function StackNavigators({ route, navigation }: ScreenProps) {
+export function AppointmentStackNavigator({ route, navigation }: ScreenProps) {
 
   return (
       <Stack.Navigator>
@@ -32,4 +32,6 @@ export function StackNavigators({ route, navigation }: ScreenProps) {
       </Stack.Navigator>
   )
 }
+
+
 

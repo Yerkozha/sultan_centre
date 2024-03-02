@@ -10,6 +10,9 @@ import Toast from 'react-native-toast-message';
 import ErrorBoundary from '@/services/ErrorBoundary.tsx';
 
 import { MD3LightTheme as DefaultTheme, PaperProvider } from 'react-native-paper';
+import BootSplash from "react-native-bootsplash";
+
+import '@/i18n'
 
 const theme = {
   ...DefaultTheme,
@@ -26,6 +29,8 @@ const theme = {
  * LOGO
  * UX/UI LOGIN && PROFILE
  * RELEASE
+ * 
+ * different db, changing url of db!!!
  */
 
 /**
@@ -38,6 +43,20 @@ const theme = {
  * PRACTICE HARD
  */
 
+/**
+ * MUST REVIEW ERRORS
+ * 
+ * try again in error page <> articles fetching loop
+ * 
+ * fastImage
+ * camera
+ * map
+ * 
+ */
+
+
+
+
 function App(): React.JSX.Element {
   
   
@@ -45,6 +64,15 @@ function App(): React.JSX.Element {
 
     FirebaseMessageHandlers.requestUserPermission();
     const unsubscribers = FirebaseMessageHandlers.initializeRemoteMessageHandlers();
+
+    const init = async () => {
+
+    }
+    init().finally(async () => {
+      await BootSplash.hide({ fade: true });
+      console.log("BootSplash has been hidden successfully");
+    });
+
     return () => {
       if(unsubscribers.length) {
         unsubscribers.forEach((unsubscriber) => unsubscriber())

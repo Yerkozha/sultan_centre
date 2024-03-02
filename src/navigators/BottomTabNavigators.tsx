@@ -2,7 +2,7 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { RootStackParamList } from "./types";
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { HomeContainer } from "@/presentation/container/HomeContainer";
+import {HomeContainer} from "@/presentation/container/HomeContainer";
 import AppointmentContainer from "@/presentation/container/AppointmentContainer";
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
@@ -14,7 +14,7 @@ export function BottomTabNavigators () {
           tabBarIcon: ({ focused, color, size }) => {
             let iconName = "";
   
-            if (route.name === 'Home') {
+            if (route.name === 'HomeContainer') {
               iconName = focused
                 ? 'information-circle'  
                 : 'information-circle-outline';
@@ -29,7 +29,7 @@ export function BottomTabNavigators () {
           tabBarInactiveTintColor: 'gray',
         })}
       >
-        <Tab.Screen name="Home" component={HomeContainer} />
+        <Tab.Screen name="HomeContainer" component={HomeContainer} />
         <Tab.Screen name="Appointment" component={AppointmentContainer} />
       </Tab.Navigator>)
   }

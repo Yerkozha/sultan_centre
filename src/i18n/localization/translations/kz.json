@@ -1,0 +1,33 @@
+{
+    "language": "Kazakh",
+    "screens": {
+        "intro": {
+            "title": "Intro Screen",
+            "text": {
+                "introText": "This is the intro text in english",
+                "login": "Login",
+                "signup": "Sign Up"
+            }
+        },
+        "login": {
+            "title": "Sign in",
+            "text": {
+                "login": "login",
+                "emailAddress": "Email address",
+                "password": "password",
+                "continue": "Continue",
+                "createAccount": "Create an Account",
+                "forgotPassword": "Forgotten password?"
+            }
+        },
+        "logout": {
+            "title": "Шығу",
+            "text": {
+                "logout": "шығу"
+            }
+        },
+        "articles": {
+            "header": "Мақалалар"
+        }
+    }
+}
