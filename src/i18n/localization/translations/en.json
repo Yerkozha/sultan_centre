@@ -2,17 +2,21 @@
     "language": "English",
     "screens": {
         "intro": {
-            "title": "Intro Screen",
-            "text": {
-                "introText": "This is the intro text in english",
-                "login": "Login",
-                "signup": "Sign Up"
-            }
+            "title": "Welcome to Sultan Centre",
+            "text": "Further processing means you agree to collection and processing of personal data"
         },
         "login": {
             "title": "Sign in",
+            "createAccount": "Create an Account"
+        },
+        "feedback": {
+            "placeholder": "Could you describe the error",
+            "btnText": "Send"
+        },
+        "signup": {
+            "title": "Sign Up",
             "text": {
-                "login": "login",
+                "login": "Войти",
                 "emailAddress": "Email address",
                 "password": "password",
                 "continue": "Continue",
@@ -27,7 +31,27 @@
             }
         },
         "articles": {
-            "header": "Articles"
+            "header": "Articles",
+            "btn": "Schedule"
+        },
+        "appointment": {
+            "tipFinish":"Finish",
+            "tipFinishContent":"Choose a convenient time and keep holding finger on the marked field",
+            "save":"SAVE",
+            "delete":"DELETE",
+            "cancel":"CANCEL",
+            "title": "Title",
+            "summary": "Additional comments",
+            "success":"Appointment was made successully"
+        },
+        "settings":{
+            "profile": "Profile",
+            "setting": "Settings",
+            "language": "Language",
+            "feedback": "Report a bag",
+            "shareFriend": "To share with friends",
+            "qa": "Q & A",
+            "appShare": "Assalamualeikum dear clients, we are glad to see you"
         }
     }
 }

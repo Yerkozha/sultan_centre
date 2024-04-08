@@ -24,6 +24,10 @@ export type UserCredentials = {
     password: string
 }
 
+export type Feedback = {
+    description: string
+}
+
 
 export type ArticleCredentials = {
     title: string

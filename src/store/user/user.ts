@@ -1,5 +1,5 @@
-import { AuthController } from '@/api'
-import { AuthResponse, UserCredentials } from '@/api/types'
+import { AuthController, ErrorController } from '@/api'
+import { AuthResponse, Feedback, UserCredentials } from '@/api/types'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '@/store'
 
@@ -25,7 +25,8 @@ const initialState: UserInitialState = {
   error: [],
   password: null,
 
-  rootError: false
+  rootError: false,
+
 }
 
 export const auth = createAsyncThunk('user/auth', async (auth: UserCredentials & {type: string}, {rejectWithValue, getState}) => {
@@ -94,6 +95,19 @@ export const auth = createAsyncThunk('user/auth', async (auth: UserCredentials &
     
 })
 
+export const feedback = createAsyncThunk('user/feedback', async (feedbackContent: Feedback, {rejectWithValue, getState}) => {
+  try {
+
+    const data = await ErrorController.createFeedback(feedbackContent)
+    console.log('FEEDBACK',data)
+    return data
+
+  } catch( err ) {
+    throw rejectWithValue(err)
+  }
+
+})
+
 
 /**
  * AbortControler to abort request actions when fast jumping pages !!!
@@ -106,7 +120,7 @@ export const userSlice = createSlice({
     userResetStore: (state) => initialState,
     resetError: (state) => { state.error = [] },
     raiseRootError: (state) => { state.rootError = true },
-    hideRootError: (state) => { state.rootError = false }
+    hideRootError: (state) => { state.rootError = false },
   },
 
   extraReducers: (builder) => {

@@ -10,7 +10,7 @@ import { articleSlice } from './articles/articles'
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['user'],
+  blacklist: ['user'],
 }
 
 const rootReducer = combineReducers({

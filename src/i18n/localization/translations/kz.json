@@ -1,18 +1,22 @@
 {
-    "language": "Kazakh",
+    "language": "Қазақша",
     "screens": {
         "intro": {
-            "title": "Intro Screen",
-            "text": {
-                "introText": "This is the intro text in english",
-                "login": "Login",
-                "signup": "Sign Up"
-            }
+            "title": "Қош келдіңіз",
+            "text": "Жалғастыра отырып, сіз жеке деректердің жиналу және өңделуіне келісесіз"
         },
         "login": {
-            "title": "Sign in",
+            "title": "Кіру",
+            "createAccount": "Тіркелу"
+        },
+        "feedback": {
+            "placeholder": "Кездестірген қате туралы мәлімет жазсаңыз",
+            "btnText": "Хабарлау"
+        },
+        "signup": {
+            "title": "Тіркелу",
             "text": {
-                "login": "login",
+                "login": "Войти",
                 "emailAddress": "Email address",
                 "password": "password",
                 "continue": "Continue",
@@ -27,7 +31,27 @@
             }
         },
         "articles": {
-            "header": "Мақалалар"
+            "header": "Мақалалар",
+            "btn": "Жазылу"
+        },
+        "appointment": {
+            "tipFinish": "Аяқтау",
+            "tipFinishContent": "Жазылу үшін, қолайлы уақытты таңдап, келтірілген аймақты басып тұрыңыз",
+            "save":"САҚТАУ",
+            "delete":"ЖОЮ",
+            "cancel":"ҚАЙТАРУ",
+            "title": "...ем алу",
+            "summary": "Қосымша нұсқаулықтар",
+            "success":"Сіз сәтті түрде жазылдыңыз"
+        },
+        "settings":{
+            "profile": "Профиль",
+            "setting": "Баптау",
+            "language": "Тілі",
+            "feedback": "Қате туралы хабарлау",
+            "shareFriend": "Достармен бөлісу",
+            "qa": "Сұрақ-жауап",
+            "appShare": "Ас саламу алейкум, Sultan Centre қосымшасын жүктеп, орталықтың қызметтерін қолданыңыз."
         }
     }
 }

@@ -22,7 +22,7 @@ const languageDetectorPlugin = {
                     //if language was stored before, use this language in the app
                     return callback(language);
                 } else {
-                    //if language was not stored yet, use english
+                    
                     return callback("kz");
                 }
             });

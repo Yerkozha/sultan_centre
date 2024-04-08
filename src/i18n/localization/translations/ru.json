@@ -1,18 +1,22 @@
 {
-    "language": "Russian",
+    "language": "Руский",
     "screens": {
         "intro": {
-            "title": "Intro Screen",
-            "text": {
-                "introText": "This is the intro text in english",
-                "login": "Login",
-                "signup": "Sign Up"
-            }
+            "title": "Добро пожаловать ",
+            "text": "Продолжая, вы соглашаетесь на сбор и обработку личных данных"
         },
         "login": {
-            "title": "Sign in",
+            "title": "Войти",
+            "createAccount": "Создать аккаунт"
+        },
+        "feedback": {
+            "placeholder": "Можете описать ошибку",
+            "btnText": "Отправить"
+        },
+        "signup": {
+            "title": "Регистрация",
             "text": {
-                "login": "login",
+                "login": "Войти",
                 "emailAddress": "Email address",
                 "password": "password",
                 "continue": "Continue",
@@ -27,7 +31,27 @@
             }
         },
         "articles": {
-            "header": "Статьи"
+            "header": "Статьи",
+            "btn":"Записаться"
+        },
+        "appointment": {
+            "tipFinish":"Окончить",
+            "tipFinishContent":"Чтобы записаться, выберите удобное время и удерживайте отмеченное поле",
+            "save":"СОХРАНИТЬ",
+            "delete":"УДАЛИТЬ",
+            "cancel":"ОТМЕНИТЬ",
+            "title": "... добрый день",
+            "summary": "Дополнительные коментарии",
+            "success":"Вы успешно записались"
+        },
+        "settings":{
+            "profile": "Профиль",
+            "setting": "Настройки",
+            "language": "Язык",
+            "feedback": "Сообщить об ошибке",
+            "shareFriend": "Поделиться с друзьями",
+            "qa": "Вопрос-ответ",
+            "appShare": "Ас саламу алейкум, скачайте и оцените онлайн услуги Sultan Centre"
         }
     }
 }

@@ -8,6 +8,9 @@ import { RootStackParamList, ScreenProps } from '@/navigators/types'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 
+
+
+
 const homeViewModel = new HomeViewModel()
 
 function ArticlesWrapper (props) {
@@ -44,6 +47,7 @@ const ArticlesHOCWrapped =  connector(ArticlesWrapper)
 
 function ArticlePageWrapper (props) {
     console.log('PROPS', props)
+   
 
     useEffect(() => {
         console.log('HOME IS MOUNTED!')

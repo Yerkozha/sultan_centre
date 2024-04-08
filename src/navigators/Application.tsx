@@ -9,15 +9,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {HomeContainer} from '@/presentation/container/HomeContainer';
-import ProfileContainer from '@/presentation/container/ProfileContainer';
-import AuthContainer from '@/presentation/container/AuthContainer';
+import ProfileStackNavigator from '@/presentation/container/ProfileContainer';
 
 import { AppointmentStackNavigator } from './StackNavigators';
-import { useAppSelector } from '@/hooks/useStore';
-import { Base } from '@/api';
-import { RequestEngine, ResponseEngine } from '@/api/interceptors';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+
 import { ConnectedProps, connect, shallowEqual, useStore } from 'react-redux';
 import { RootState } from '@/store';
+
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 
@@ -25,18 +24,17 @@ const tabScreenOption = ({ route }: TapOptionRoute) => ({
     tabBarIcon: ({ focused, color, size }: TabBarIconProp) => {
     let iconName = "";
 
-    if (route.name === 'Home') {
-        iconName = focused
-        ? 'information-circle'
-        : 'information-circle-outline';
+    if (route.name === 'HomeContainer') {
+        iconName = focused ? 'moon-sharp' : 'moon-outline';
     } else if (route.name === 'AppointmentStackNavigator') {
-        iconName = focused ? 'list' : 'list-outline';
-    } else if (route.name === 'Profile') {
-        iconName = focused ? 'accessibility' : 'accessibility-outline';
+        iconName = focused ? 'book' : 'book-outline';
+    } else if (route.name === 'ProfileStackNavigator') {
+        iconName = focused ? 'grid' : 'grid-outline';
+        
     } else if(route.name === 'SignIn'){
-        iconName = focused ? 'list' : 'list-outline';
+        iconName = focused ? 'book' : 'book-outline';
     } else if(route.name === 'SignUp'){
-        iconName = focused ? 'list' : 'list-outline';
+        iconName = focused ? 'grid' : 'grid-outline';
     }
 
     // You can return any component that you like here!
@@ -44,7 +42,9 @@ const tabScreenOption = ({ route }: TapOptionRoute) => ({
     },
     tabBarActiveTintColor: 'tomato',
     tabBarInactiveTintColor: 'gray',
-    headerShown: false
+    headerShown: false,
+    tabBarHideOnKeyboard: true,
+    tabBarLabel: () => null,
 })
 
 
@@ -52,32 +52,30 @@ const tabScreenOption = ({ route }: TapOptionRoute) => ({
 function AppNavigators ({access}) {
    console.log('access', access)
 
-   const accessToken = (useStore().getState() as RootState).user.access
+   const accessToken = useAppSelector(state => state.user.access);
     console.log('accessToken', accessToken)
-    useEffect(() => {
-        Base.getInstance().attachInterceptorEngine(new RequestEngine()).attachInterceptorEngine(new ResponseEngine())
-    }, [])
     
+
     return (
         <SafeAreaView style={styles.container}>
             <NavigationContainer ref={navigationRef}>
-                <StatusBar barStyle={'dark-content'} backgroundColor={Colors.white} /> 
+                <StatusBar animated={true} barStyle={'dark-content'} backgroundColor={Colors.white} /> 
                 <Tab.Navigator
                     screenOptions={tabScreenOption}
                 >
-                    <Tab.Screen name="HomeContainer"  component={HomeContainer} />
-                    {/*  options={{title: 'Bla', headerShown: true}} */}
-                    { accessToken ? (
-                    <>
-                        <Tab.Screen name="AppointmentStackNavigator"  component={AppointmentStackNavigator} />
-                        <Tab.Screen name="Profile"          component={ProfileContainer} />
-                    </>
-                ) : (
-                    <>
-                        <Tab.Screen name="SignIn"  component={AuthContainer} />
-                        <Tab.Screen name="SignUp"  component={AuthContainer} />
-                    </>
-                )}
+                    <Tab.Screen name="HomeContainer"  component={HomeContainer}
+                        listeners={({navigation}) => ({
+                            tabPress: (event) => {
+                                event.preventDefault();
+                                navigation.navigate('Articles')
+                            }
+                        })}
+                    />
+                    <Tab.Screen name="AppointmentStackNavigator"  component={AppointmentStackNavigator}
+                    />
+                    <Tab.Screen name="ProfileStackNavigator"          component={ProfileStackNavigator} 
+                            
+                    />
                 </Tab.Navigator>
             </NavigationContainer>
         </SafeAreaView>
@@ -95,6 +93,7 @@ export default connector(AppNavigators)
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.backgroundColor
+        backgroundColor: Colors.backgroundColor,
+        
     }
 })

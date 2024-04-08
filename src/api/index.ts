@@ -3,6 +3,7 @@ import { FCMCredentials, UserCredentials } from "./types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { raiseRootError, userResetStore } from "@/store/user/user";
 import { appointmentResetStore } from "@/store/appointment/appointment";
+import i18n from "@/i18n/i18n";
 
 
 interface FetchOptions {
@@ -25,13 +26,14 @@ interface FetchOptions {
 
 abstract class FetchBase {
 
-    protected static originURL: Nullable<string> = 'http://127.0.0.1:8000/';
+    protected static originURL: Nullable<string> = 'http://195.49.210.112:8000/api/';
 
     protected static fetchOptions: RequestInit = {
         method: "POST", 
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
+            
         },
         body: undefined as BodyInit_ | undefined
     }
@@ -91,13 +93,15 @@ export class Base extends FetchBase {
     }
 
     static makeRequestBasedOnOptions( url, baseOptions, customOptions ) {
-
+        console.log("i18n.language", i18n.language)
         /**
          * new Header()
          */
+        
         const headers = new Headers({
             ...baseOptions['headers'],
-            ...customOptions['headers']
+            ...customOptions['headers'],
+            'Accept-Language': ((ln) => ln === 'kz'? 'kk': ln)(i18n.language)
         })
 
         const request = new Request(url, {
@@ -446,6 +450,19 @@ export class ArticlesController extends Base {
         const data = await this.fetch<T>( 'articles/create_article/', {
             body: JSON.stringify(articleDetails)
         } )
+        
+        return data
+    }
+
+}
+
+export class ErrorController extends Base {
+
+    static async createFeedback(feedback) {
+
+        const data = await this.fetch( `users/feedback`, {
+            body: JSON.stringify(feedback)
+        })
         
         return data
     }

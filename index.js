@@ -32,3 +32,10 @@ AppRegistry.registerComponent(appName, () => App);
  * 
  * 
  */
+
+/**
+ * @FAST_IMAGE android/app/proguard-rules.pro:
+ * 
+ * 
+ * 
+ */

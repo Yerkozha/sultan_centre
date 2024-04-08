@@ -13,9 +13,12 @@ export type RootStackParamList = {
   Profile: undefined;
   SignUp: undefined;
   SignIn: undefined;
+  WelcomePage: undefined;
+  TestComponent: undefined;
   
   BottomTabNavigators: undefined;
   AppointmentStackNavigator: undefined;
+  ProfileStackNavigator: undefined;
   
 };
 

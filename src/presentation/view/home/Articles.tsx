@@ -9,6 +9,7 @@ import { useAppSelector } from "@/hooks/useStore";
 import { Platform } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { useTranslation } from "react-i18next";
+import FastImage from "react-native-fast-image";
 
 type RouteParams = NativeStackScreenProps<RootStackParamList, 'Articles'>;
 /**
@@ -70,14 +71,12 @@ const styles = StyleSheet.create({
 const ArticleItem = ({item}) => {
 
     return (<View style={styles.innerContainer}>
-            <Image
+            <FastImage
                 style={styles.img}
-                resizeMode="contain"
-                source={
-                    {
-                        uri: item.image
-                    }
-                }
+                source={{
+                    uri: item.image
+                }}
+                resizeMode={FastImage.resizeMode.contain}
             />
             <View style={styles.textWrapper}>
                 <Text style={styles.articleTitle}>{item.title}</Text>
@@ -93,18 +92,20 @@ function Articles({vm, articles, navigation}: HomeProps & ArticlesHOCWrappedAllP
     let [refreshing, setRefreshing] = useState(false)
     const articlesList = useAppSelector(state => state.articles.articles)
     
+    
 
     useEffect(() => {
         console.log('insidearticlesList', articlesList)
         articles({type: 'getList'}).unwrap()
             .then((res) => {
                 console.log('res', res)
+                // CHECK ( cause infinite rerender and request device app )
             })
 
 
         return () => {
         }
-    },[])
+    },[i18n.language])
 
     const renderItem = ({item, separators}) => {
 

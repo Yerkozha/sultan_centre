@@ -47,14 +47,14 @@ export const useValidate = (resetError) => {
         setIsFormValid(Object.keys(errors).length === 0); 
     }; 
 
-    useEffect(() => {
+    useEffect(() => { 
 
         if( user.error.length ) {
             user.error.forEach((error) => {
-                Object.entries(error).forEach(([_,value]) => {
+                Object.entries(error).forEach(([_,value]: [string,string]) => {
                     
                     if( _ !== 'status_code' && !isObject(value) ) {
-                        Toast.show({type: 'error', text1: value as string})
+                        Toast.show({type: 'customToast', text1: value as string})
                         setDirtyFields((s) => ({...s, _: true}))
                         setErrors({_: value})
                     }

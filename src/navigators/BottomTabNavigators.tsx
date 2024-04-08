@@ -27,6 +27,7 @@ export function BottomTabNavigators () {
           },
           tabBarActiveTintColor: 'tomato',
           tabBarInactiveTintColor: 'gray',
+          
         })}
       >
         <Tab.Screen name="HomeContainer" component={HomeContainer} />

@@ -8,14 +8,16 @@ import { isObject } from '@/utils';
 
 
 interface AppointmentState {
-    appointments: Array<Appointment>,
-    error: Array<unknown>
+    appointments: Array<Appointment>;
+    error: Array<unknown>;
+    isAreaActive: boolean
 }
 
 interface IncomeAppointmentType {
     data?: Omit<AppointmentCredentials,'user_id'>
     type: string
 }
+
 
 export const appointment = createAsyncThunk( 'appointment/process' , async ( appointmentDetails: IncomeAppointmentType, thunkAPI ) => {
     let 
@@ -55,7 +57,8 @@ export const appointment = createAsyncThunk( 'appointment/process' , async ( app
 
 const initialState: AppointmentState = {
     appointments: [],
-    error: []
+    error: [],
+    isAreaActive: false
 } 
 
 export const appointmentSlice = createSlice({
@@ -63,6 +66,7 @@ export const appointmentSlice = createSlice({
     initialState,
     reducers: {
         appointmentResetStore: (state) => initialState,
+        setIsAreaActive: (state, {payload}) => {state.isAreaActive = payload}
     },
     extraReducers: (builder) => {
         builder.addCase(appointment.fulfilled, (state, { payload }) => {
@@ -83,7 +87,8 @@ export const appointmentSlice = createSlice({
 
                 return {
                     appointments: payload.response,
-                    error: []
+                    error: [],
+                    isAreaActive: state.isAreaActive
                 }            
             }
             
@@ -97,6 +102,6 @@ export const appointmentSlice = createSlice({
     }
 })
 
-export const { appointmentResetStore } =  appointmentSlice.actions
+export const { appointmentResetStore, setIsAreaActive } =  appointmentSlice.actions
 
 

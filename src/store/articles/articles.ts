@@ -26,7 +26,12 @@ const initialState: ArticlesInterface = {
   error: []
 }
 
-
+function reverseList( response ) {
+  if( Object.hasOwn(response, "articles") ) {
+    response.articles.sort((prev, next) => next.id - prev.id)
+  }
+  return response
+}
 
 export const articles = createAsyncThunk('artices/home', async (article: IncomeArticlesType, {rejectWithValue, getState}) => {
 
@@ -49,7 +54,8 @@ export const articles = createAsyncThunk('artices/home', async (article: IncomeA
       if( article.type === 'getList' ) {
 
         data = await ArticlesController.getListArticles()
-
+        reverseList(data)
+        
         // const {articles} = getState() as RootState
         // console.log('articles', articles )
 

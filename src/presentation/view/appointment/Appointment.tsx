@@ -2,7 +2,7 @@
 import { ScreenProps } from '@/navigators/types';
 import { AppointmentContainerAllProps } from '@/presentation/container/AppointmentContainer';
 import { groupBy, timeDateToDate } from '@/utils';
-import React, {useEffect, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import {Alert, Modal, PermissionsAndroid, Pressable, StyleSheet, Text,  TouchableOpacity, View} from 'react-native';
 import {
   ExpandableCalendar,
@@ -20,12 +20,65 @@ import { Event } from 'react-native-calendars/src/timeline/EventBlock';
 import Toast from 'react-native-toast-message';
 
 import { TextInput } from 'react-native-paper';
+import {
+  CopilotProvider,
+  CopilotStep,
+  useCopilot,
+  walkthroughable,
+} from "react-native-copilot";
+import { useTranslation } from 'react-i18next';
 
 /**
  * TITLE, DETAILS => Django Model
  * Android Calendar form
  * 
+ * END FEEDBACK utka telegram
+ * 
  */
+import {LocaleConfig} from 'react-native-calendars';
+import i18nLN from '@/i18n/i18n';
+import { useNavigation } from '@react-navigation/native';
+import { useAppSelector } from '@/hooks/useStore';
+
+LocaleConfig.locales['kz'] = {
+  monthNames: [
+    'Қаңтар',
+    'Ақпан',
+    'Наурыз',
+    'Сәуір',
+    'Мамыр',
+    'Маусым',
+    'Шілде',
+    'Тамыз',
+    'Қыркүйек',
+    'Қазан',
+    'Қараша',
+    'Желтоқсан'
+  ],
+  monthNamesShort: ['Қаңт.', 'Ақп.', 'Наур.', 'Сәу.', 'Ма.', 'Мау.', 'Шіл.', 'Там.', 'Қыр.', 'Қаз.', 'Қар.', 'Жел.'],
+  dayNames: ['Дүйсенбі', 'Сейсенбі', 'Сәрсенбі', 'Бейсенбі', 'Жұма', 'Сенбі', 'Жексенбі'],
+  dayNamesShort: ['Дүй.', 'Сей.', 'Сәр.', 'Бей.', 'Жұм.', 'Сен.', 'Жек.'],
+  today: "Бүгін"
+};
+LocaleConfig.locales['en'] = LocaleConfig.locales['']
+
+LocaleConfig.locales['ru'] = {
+  monthNames: [
+    "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+  ],
+  monthNamesShort: ['Янв.', 'Фев.', 'Мар.', 'Апр.', 'Ма.', 'Июн.', 'Июл.', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.'],
+  dayNames: ['Понидельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'],
+  dayNamesShort: ['Пон.', 'Втр.', 'Срд.', 'Чет.', 'Пят.', 'Суб.', 'Воск.'],
+  today: "Сегодня"
+};
+
+
+LocaleConfig.defaultLocale = i18nLN.language;
+
+
+
+
+
 
 const INITIAL_TIME = {hour: 9, minutes: 0};
 
@@ -161,7 +214,59 @@ interface BaseAppointmentState {
   }
 }
 
-export default function Appointment( {vm, navigation, appointment}: AppointmentContainerAllProps & AppointmentProps & ScreenProps ) {
+const typedMemo: <T>(c: T) => T = React.memo
+
+const MemoWrappedTips = typedMemo(function MemoWrappedTips({setIsAreaActive}) {
+  const {start, copilotEvents } = useCopilot()
+  const CopilotView = walkthroughable(View);
+  const isAreaActive = useAppSelector((state) => state.appointment.isAreaActive)
+  const { t, i18n } = useTranslation();
+
+  const [copilotArea, setCopilotArea] = useState(false)
+  
+  const navigation = useNavigation()
+  
+  useEffect(() => {
+    // function onFocusScreenHandler() {
+    //   start()
+    // }
+    // navigation.addListener('focus', onFocusScreenHandler)
+
+    function copilotHandler() {
+      setIsAreaActive(true);
+      setCopilotArea(true);
+      console.log('STOP FIRED')
+    } 
+    copilotEvents.on('stop', copilotHandler)
+    return () => {
+      copilotEvents.off('stop', copilotHandler)
+      // navigation.removeListener('focus', onFocusScreenHandler)
+    }
+  }, [])
+
+  const TipArea = ({copilot }: any) => {
+
+    return (<View {...copilot } style={{
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      height: "50%",
+      width: "100%",
+    }}>
+
+    </View>)
+  }
+
+  return ((!copilotArea && !isAreaActive) ? <View style={{position: "absolute" ,width: "100%", height: "100%"}} onLayout={() => start()}>
+      <CopilotStep text={t("screens.appointment.tipFinishContent")} order={1} name="appointmentStart">
+        <TipArea />
+      </CopilotStep>
+    </View> : null)
+})
+
+export default function Appointment( {vm, navigation, appointment, setIsAreaActive}: AppointmentContainerAllProps & AppointmentProps & ScreenProps ) {
+
+  const { t, i18n } = useTranslation();
 
   const [state, setState] = useState<BaseAppointmentState>({
     currentDate: getDate(),
@@ -180,8 +285,19 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
   const [currentEvent, setCurrentEvent] = useState<Event>()
 
   const [sendRequestTemp,setSendRequestTemp] = useState(true)
-
+  
   useEffect(() => {
+    console.log('LANG CHHHH')
+  }, [i18n])
+  useEffect(() => {
+    const languageChangeHandler = () => {
+      LocaleConfig.defaultLocale = i18n.language;
+      console.log('L CHANGED!!')
+      console.log("LocaleConfig.locales['']",LocaleConfig.locales[''])
+    }
+
+    i18n.on("languageChanged", languageChangeHandler)
+    
     console.log('DATE',state.eventsByDate)
     console.log('APPOINTMENT MOUNTED!');
     appointment({type: 'getList'}).unwrap()
@@ -202,12 +318,14 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
             return timeDateToDate(e.start)
           })
         }))
-
+        console.log("i18n.language", i18n.language)
       }).catch((err) => {
         console.log('UI ERR',err)
       })
 
     return () => {
+      setIsAreaActive(false)
+      i18n.off("languageChanged", languageChangeHandler)
       console.log('APPOINTMENT UNMOUNTED!')
     }
   }, [])
@@ -286,7 +404,7 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
                   [timeObject?.date]: [...s.eventsByDate[timeObject?.date] , {...response}]
                 }
               }));
-
+              Toast.show({type: 'success', text1: t('screens.appointment.success'), visibilityTime: 6000})
               console.log("UI RES",response)
             }).catch((err) => {
 
@@ -407,6 +525,8 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
 
   const onDateChanged = (date: string, source: string) => {
     console.log('TimelineCalendarScreen onDateChanged: ', date, source);
+    
+   
     setState((s) => ({...s,currentDate: date}));
   };
 
@@ -441,15 +561,15 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
           {editMode ? (
             <View style={styles.top}>
               <TouchableOpacity style={styles.button} onPress={onPressDelete}>
-                <Text style={styles.textStyle}>DELETE</Text>
+                <Text style={styles.textStyle}>{t('screens.appointment.delete')}</Text>
               </TouchableOpacity>
             </View>) : (
             <View style={styles.top}>
               <TouchableOpacity style={styles.button} onPress={onPressCancel}>
-                <Text style={styles.textStyle}>CANCEL</Text>
+                <Text style={styles.textStyle}>{t('screens.appointment.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.button, {opacity: !(!!title) ? 0.5 : 1}]} onPress={onPressApprove} disabled={!(!!title)}>
-                <Text style={styles.textStyle}>SAVE</Text>
+                <Text style={styles.textStyle}>{t('screens.appointment.save')}</Text>
               </TouchableOpacity>
             </View>)
           }
@@ -459,7 +579,7 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
               <Ionicons name="code" size={20} />
               <TextInput 
                   style={styles.input}
-                  label="Title"
+                  label={t('screens.appointment.title')}
                   onChangeText={onTitleChange}
                   value={title}
               />
@@ -469,7 +589,7 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
               <Ionicons name="code" size={20}/>
               <TextInput 
                   style={styles.input}
-                  label="Summary"
+                  label={t('screens.appointment.summary')}
                   onChangeText={onSummaryChange}
                   value={summary}
               />
@@ -501,22 +621,26 @@ export default function Appointment( {vm, navigation, appointment}: AppointmentC
         onMonthChange={onMonthChange}
         showTodayButton
         disabledOpacity={0.6}
+        style={{zIndex: 22}}
+        key={i18n.language}
         // numberOfDays={3}
       >
         <ExpandableCalendar
-          firstDay={1}
-          
+          firstDay={7}
           markedDates={marked}
         />
+         
         <TimelineList
           events={state.eventsByDate}
           timelineProps={timelineProps}
-          showNowIndicator
-          // scrollToNow
-          scrollToFirst
+          showNowIndicator={true}
+          scrollToNow={true}
+      
           initialTime={INITIAL_TIME}
         />
+          
       </CalendarProvider>
+      <MemoWrappedTips setIsAreaActive={setIsAreaActive} />
     </>
   );
 }
@@ -536,6 +660,7 @@ function CustomRadioButton ({  selected, onSelect, color }) {
 
 
 const styles = StyleSheet.create({
+  
   top: {
     backgroundColor: '#f2f2f2',
     flexDirection: 'row',
